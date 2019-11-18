@@ -468,4 +468,85 @@ public class Database {
         }
     }
 
+    // users
+    public boolean updateUserPassword(User user, String password) {
+        try (Connection connection = getConnection()) {
+            Statement statement = connection.createStatement();
+            statement.execute("CALL change_user_password(" +
+                    "\"" + user.nameObservable().getValue() + "\", " +
+                    "\"" + password + "\"" +
+                    ");");
+            return true;
+        }
+        catch (SQLException e) {
+            System.out.println(e);//TODO delete
+            return false;
+        }
+    }
+
+    public boolean updateUserRole(User user, Role role) {
+        try (Connection connection = getConnection()) {
+            Statement statement = connection.createStatement();
+            switch (role) {
+                case Guest: statement.execute("CALL make_user_guest(" +
+                        "\"" + user.nameObservable().getValue() + "\"" +
+                        ");");
+                    break;
+                case Editor: statement.execute("CALL make_user_editor(" +
+                        "\"" + user.nameObservable().getValue() + "\"" +
+                        ");");
+                    break;
+                default:
+                    return false;
+            }
+
+            user.setRole(role);
+            return true;
+        }
+        catch (SQLException e) {
+            System.out.println(e);//TODO delete
+            return false;
+        }
+    }
+
+    public boolean createUser(String name, String password, Role role) {
+        try (Connection connection = getConnection()) {
+            Statement statement = connection.createStatement();
+            switch (role) {
+                case Guest: statement.execute("CALL create_user_guest(" +
+                        "\"" + name + "\", " +
+                        "\"" + password + "\"" +
+                        ");");
+                    break;
+                case Editor: statement.execute("CALL create_user_editor(" +
+                        "\"" + name + "\", " +
+                        "\"" + password + "\"" +
+                        ");");
+                    break;
+                default:
+                    return false;
+            }
+
+            return true;
+        }
+        catch (SQLException e) {
+            System.out.println(e);//TODO delete
+            return false;
+        }
+    }
+
+    public boolean delete(User user) {
+        try (Connection connection = getConnection()) {
+            Statement statement = connection.createStatement();
+            statement.execute("CALL delete_user(" +
+                    "\"" + user.nameObservable().getValue() + "\"" +
+                    ");");
+            return true;
+        }
+        catch (SQLException e) {
+            System.out.println(e); //TODO delete
+            return false;
+        }
+    }
+
 }

@@ -8,13 +8,10 @@ import javafx.beans.value.ObservableValue;
 import sample.Database;
 
 public class User {
-    private StringProperty name = new SimpleStringProperty(),
-                           displayRole = new SimpleStringProperty();
+    private StringProperty name = new SimpleStringProperty();
     private ObjectProperty<Database.Role> role = new SimpleObjectProperty<>();
 
     public User(String name, Database.Role role) {
-        this.role.addListener((observable, oldValue, newValue) ->
-                displayRole.setValue(role.toString()));
 
         this.name.setValue(name);
         this.role.setValue(role);
@@ -24,13 +21,15 @@ public class User {
         return name;
     }
 
-    // TODO delete
-    public ObservableValue<String> displayRoleObservable() {
-        return displayRole;
-    }
-
     public ObservableValue<Database.Role> roleObservable() {
         return role;
     }
+
+    public void setRole(Database.Role role) {
+        this.role.set(role);
+    }
+
+
+
 
 }

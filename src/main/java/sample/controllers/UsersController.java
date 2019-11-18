@@ -50,9 +50,9 @@ public class UsersController implements Initializable {
         if (data == null)
             return;
 
-        System.out.println(data.name);
-        System.out.println(data.password);
-        // TODO use database to update password
+        if (!database.updateUserPassword(user, data.password)) {
+            Dialogs.showError("Ошибка изменения пароля.");
+        }
     }
 
     @FXML private void onEditRolePressed() {
@@ -64,9 +64,9 @@ public class UsersController implements Initializable {
         if (data == null)
             return;
 
-        System.out.println(data.name);
-        System.out.println(data.role);
-        // TODO use database to update role
+        if (!database.updateUserRole(user, data.role)) {
+            Dialogs.showError("Ошибка изменения роли.");
+        }
     }
 
     @FXML private void onCreatePressed() {
@@ -74,10 +74,9 @@ public class UsersController implements Initializable {
         if (data == null)
             return;
 
-        System.out.println(data.name);
-        System.out.println(data.password);
-        System.out.println(data.role);
-        // TODO use database to create user
+        if (!database.createUser(data.name, data.password, data.role)) {
+            Dialogs.showError("Ошибка создания пользователя.");
+        }
     }
 
     @FXML private void onDeletePressed() {
@@ -89,8 +88,9 @@ public class UsersController implements Initializable {
         if (Dialogs.askFor(askString) == ButtonType.NO)
             return;
 
-        System.out.println("fake delete user \"" + user.nameObservable().getValue() + "\"");
-        // TODO use database to delete user
+        if (!database.delete(user)) {
+            Dialogs.showError("Ошибка удаления пользователя.");
+        }
     }
 
 }
