@@ -276,11 +276,32 @@ public class Database {
                     "\"" + dateFormat.format(releaseDate) + "\", " +
                     "\"" + torrent + "\"" +
                     ");");
-            // TODO update in container (maybe)
+
+            series.setNumber(number);
+            series.setName(name);
+            series.setReleaseDate(releaseDate);
+            series.setTorrentLink(torrent);
             return true;
         }
         catch (SQLException e) {
             System.out.println(e);// TODO delete
+            return false;
+        }
+    }
+
+    public boolean update(Genre genre, String name) {
+        try (Connection connection = getConnection()) {
+            Statement statement = connection.createStatement();
+            statement.execute("CALL update_genre(" +
+                    genre.getId() + ", " +
+                    "\"" + name + "\"" +
+                    ");");
+
+            genre.setName(name);
+            return true;
+        }
+        catch (SQLException e) {
+            System.out.println(e); // TODO delete
             return false;
         }
     }
@@ -307,6 +328,8 @@ public class Database {
                             ");");
                 }
                 connection.commit();
+
+                // TODO (maybe) insert into container
                 return true;
             }
             catch (SQLException e) {
@@ -369,12 +392,29 @@ public class Database {
         }
     }
 
+    public boolean createGenre(String name) {
+        try (Connection connection = getConnection()) {
+            Statement statement = connection.createStatement();
+            statement.execute("CALL create_genre(" +
+                    "\"" + name + "\"" +
+                    ");");
+            // TODO insert into container (maybe)
+            return true;
+        }
+        catch (SQLException e) {
+            System.out.println(e); // TODO delete
+            return false;
+        }
+    }
+
     public boolean delete(Serial serial) {
         try (Connection connection = getConnection()) {
             Statement statement = connection.createStatement();
             statement.execute("CALL delete_serial(" +
                     serial.getId() +
                     ");");
+
+            // TODO (maybe) del from container
             return true;
         }
         catch (SQLException e) {
@@ -388,6 +428,8 @@ public class Database {
             statement.execute("CALL delete_season(" +
                     season.getId() +
                     ");");
+
+            // TODO (maybe) del from container
             return true;
         }
         catch (SQLException e) {
@@ -410,5 +452,20 @@ public class Database {
         }
     }
 
+    public boolean delete(Genre genre) {
+        try (Connection connection = getConnection()) {
+            Statement statement = connection.createStatement();
+            statement.execute("CALL delete_genre(" +
+                    genre.getId() +
+                    ");");
+
+            // TODO (maybe) delete from container
+            return true;
+        }
+        catch (SQLException e) {
+            System.out.println(e); // TODO delete
+            return false;
+        }
+    }
 
 }

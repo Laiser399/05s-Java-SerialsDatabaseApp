@@ -49,7 +49,9 @@ public class GenresController implements Initializable {
         if (data == null)
             return;
 
-        // TODO database update genre
+        if (!database.update(genre, data.name)) {
+            Dialogs.showError("Ошибка изменения жанра.");
+        }
     }
 
     @FXML private void onCreatePressed() {
@@ -57,7 +59,9 @@ public class GenresController implements Initializable {
         if (data == null)
             return;
 
-        // TODO database create genre
+        if (!database.createGenre(data.name)) {
+            Dialogs.showError("Ошибка создания жанра.");
+        }
     }
 
     @FXML private void onDeletePressed() {
@@ -68,6 +72,8 @@ public class GenresController implements Initializable {
         if (Dialogs.askFor("Удалить жанр \"" + genre.nameObservable().getValue() + "\"?") == ButtonType.NO)
             return;
 
-        // TODO database delete
+        if (!database.delete(genre)) {
+            Dialogs.showError("Ошибка удаления жанра.");
+        }
     }
 }

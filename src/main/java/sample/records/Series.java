@@ -57,6 +57,19 @@ public class Series {
         return torrentLink;
     }
 
+    public void setNumber(int number) {
+        this.number.set(number);
+    }
 
+    public void setName(String name) {
+        this.name.set(name);
+    }
 
+    public void setReleaseDate(Date releaseDate) {
+        this.releaseDate.set(releaseDate);
+    }
+
+    public void setTorrentLink(String torrentLink) {
+        this.torrentLink.set(torrentLink);
+    }
 }
