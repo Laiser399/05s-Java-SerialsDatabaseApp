@@ -9,12 +9,7 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import sample.Database;
-import sample.Dialogs;
-import sample.controllers.GenresController;
-import sample.controllers.SeasonsController;
-import sample.controllers.SerialsController;
-import sample.controllers.SeriesController;
+import sample.controllers.*;
 import sample.exceptions.AuthException;
 import sample.exceptions.ConnectTimeoutException;
 import sample.records.Season;
@@ -30,13 +25,14 @@ public class MainController implements Initializable {
     @FXML private VBox authPane;
     @FXML private TextField hostField, loginField, passwordField;
     //db tab pane
-    @FXML private TabPane databasePane;
+    @FXML private TabPane databaseTabPane;
     @FXML private StackPane tablesStackPane;
     @FXML private Tab genresTab, usersTab;
     private SerialsController serialsController;
     private SeasonsController seasonsController;
     private SeriesController seriesController;
     private GenresController genresController;
+    private UsersController usersController;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -45,6 +41,7 @@ public class MainController implements Initializable {
             loadSeasonsFxml();
             loadSeriesFxml();
             loadGenresFxml();
+            loadUsersFxml();
 
             serialsController.setVisible(true);
             seasonsController.setVisible(false);
@@ -54,8 +51,6 @@ public class MainController implements Initializable {
             System.out.println("Error while loading serials fxml file.");
             System.exit(-1);
         }
-
-
     }
 
     // fxml
@@ -93,17 +88,51 @@ public class MainController implements Initializable {
         genresTab.setContent(root);
     }
 
+    private void loadUsersFxml() throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/tables/users.fxml"));
+        Parent root = loader.load();
+        usersController = loader.getController();
+        usersTab.setContent(root);
+    }
+
     // methods
     private void configureForGuest() {
+        setEditableMainControllers(false);
 
+        genresTab.setDisable(true);
+        databaseTabPane.getTabs().remove(genresTab);
+
+        usersTab.setDisable(true);
+        databaseTabPane.getTabs().remove(usersTab);
     }
 
     private void configureForEditor() {
+        setEditableMainControllers(true);
 
+        genresTab.setDisable(false);
+        if (!databaseTabPane.getTabs().contains(genresTab))
+            databaseTabPane.getTabs().add(genresTab);
+
+        usersTab.setDisable(true);
+        databaseTabPane.getTabs().remove(usersTab);
     }
 
     private void configureForSuperuser() {
+        setEditableMainControllers(true);
 
+        genresTab.setDisable(false);
+        if (!databaseTabPane.getTabs().contains(genresTab))// TODO maybe without if contains
+            databaseTabPane.getTabs().add(genresTab);
+
+        usersTab.setDisable(false);
+        if (!databaseTabPane.getTabs().contains(usersTab))
+            databaseTabPane.getTabs().add(usersTab);
+    }
+
+    private void setEditableMainControllers(boolean editable) {
+        serialsController.setSerialsEditable(editable);
+        seasonsController.setSeasonsEditable(editable);
+        seriesController.setSeriesEditable(editable);
     }
 
     // fxml's events
@@ -138,6 +167,7 @@ public class MainController implements Initializable {
             seasonsController.setDatabase(database);
             seriesController.setDatabase(database);
             genresController.setDatabase(database);
+            usersController.setDatabase(database);
 
             switch (database.getRole()) {
                 case Guest: configureForGuest(); break;
@@ -145,7 +175,7 @@ public class MainController implements Initializable {
                 case Superuser: configureForSuperuser(); break;
             }
             authPane.setVisible(false);
-            databasePane.setVisible(true);
+            databaseTabPane.setVisible(true);
         }
         catch (ConnectTimeoutException e) {
             Dialogs.showError("Ошибка подключения к базе данных.");

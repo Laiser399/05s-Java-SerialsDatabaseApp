@@ -1,5 +1,6 @@
 package sample;
 
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import sample.containers.GenresContainer;
 import sample.containers.SeasonsContainer;
@@ -7,10 +8,7 @@ import sample.containers.SerialsContainer;
 import sample.containers.SeriesContainer;
 import sample.exceptions.AuthException;
 import sample.exceptions.ConnectTimeoutException;
-import sample.records.Genre;
-import sample.records.Season;
-import sample.records.Serial;
-import sample.records.Series;
+import sample.records.*;
 
 import java.sql.*;
 import java.text.SimpleDateFormat;
@@ -41,6 +39,7 @@ public class Database {
     private SerialsContainer serials = new SerialsContainer();
     private SeasonsContainer seasons = new SeasonsContainer();
     private SeriesContainer seriesContainer = new SeriesContainer();
+    private ObservableList<User> users = FXCollections.observableArrayList();
 
     // init
     public Database(String host, String login, String password) throws ConnectTimeoutException, AuthException {
@@ -54,6 +53,7 @@ public class Database {
             initSeasons(connection);
             initSeries(connection);
             initRole(connection);
+            initUsersIfNeed(connection);
         }
         catch (SQLTimeoutException e) {
             throw new ConnectTimeoutException();
@@ -148,6 +148,28 @@ public class Database {
         }
     }
 
+    private void initUsersIfNeed(Connection connection) throws SQLException {
+        if (role != Role.Superuser)
+            return;
+
+        Statement statement = connection.createStatement();
+        statement.execute("CALL get_common_users();");
+        ResultSet result = statement.getResultSet();
+        while (result.next()) {
+            String name = result.getString("user");
+            Role role = null;
+            switch (result.getString("role")) {
+                case "guest": role = Role.Guest; break;
+                case "editor": role = Role.Editor; break;
+                case "superuser": role = Role.Superuser; break;
+            }
+            if (role == null)
+                break;
+
+            users.add(new User(name, role));
+        }
+    }
+
     // methods
     public Role getRole() {
         return role;
@@ -180,6 +202,10 @@ public class Database {
 
     public ObservableList<Series> getSeriesFor(int seasonId) {
         return seriesContainer.getBySeasonId(seasonId);
+    }
+
+    public ObservableList<User> getUsers() {
+        return users;
     }
 
     // update, create, delete
@@ -220,6 +246,45 @@ public class Database {
         }
     }
 
+    public boolean update(Season season, int number, int seriesCount, String torrent) {
+        try (Connection connection = getConnection()) {
+            Statement statement = connection.createStatement();
+            statement.execute("CALL update_season(" +
+                    season.getId() + ", " +
+                    number + ", " +
+                    seriesCount + ", " +
+                    "\"" + torrent + "\"" +
+                    ");");
+
+            season.setNumber(number);
+            season.setSeriesCount(seriesCount);
+            season.setTorrentLink(torrent);
+            return true;
+        }
+        catch (SQLException e) {
+            return false;
+        }
+    }
+
+    public boolean update(Series series, int number, String name, Date releaseDate, String torrent) {
+        try (Connection connection = getConnection()) {
+            Statement statement = connection.createStatement();
+            statement.execute("CALL update_series(" +
+                    series.getId() + ", " +
+                    number + ", " +
+                    "\"" + name + "\", " +
+                    "\"" + dateFormat.format(releaseDate) + "\", " +
+                    "\"" + torrent + "\"" +
+                    ");");
+            // TODO update in container (maybe)
+            return true;
+        }
+        catch (SQLException e) {
+            System.out.println(e);// TODO delete
+            return false;
+        }
+    }
+
     public boolean createSerial(String name, String officialSite, double mark, List<Genre> genres) {
         try (Connection connection = getConnection()) {
             connection.setAutoCommit(false);
@@ -256,39 +321,6 @@ public class Database {
         }
     }
 
-    public boolean delete(Serial serial) {
-        try (Connection connection = getConnection()) {
-            Statement statement = connection.createStatement();
-            statement.execute("CALL delete_serial(" +
-                    serial.getId() +
-                    ");");
-            return true;
-        }
-        catch (SQLException e) {
-            return false;
-        }
-    }
-
-    public boolean update(Season season, int number, int seriesCount, String torrent) {
-        try (Connection connection = getConnection()) {
-            Statement statement = connection.createStatement();
-            statement.execute("CALL update_season(" +
-                    season.getId() + ", " +
-                    number + ", " +
-                    seriesCount + ", " +
-                    "\"" + torrent + "\"" +
-                    ");");
-
-            season.setNumber(number);
-            season.setSeriesCount(seriesCount);
-            season.setTorrentLink(torrent);
-            return true;
-        }
-        catch (SQLException e) {
-            return false;
-        }
-    }
-
     public boolean createSeason(Serial owner, int number, int seriesCount, String torrent) {
         try (Connection connection = getConnection()) {
             Statement statement = connection.createStatement();
@@ -308,38 +340,6 @@ public class Database {
         }
         catch (SQLException e) {
             System.out.println(e); // TODO delete
-            return false;
-        }
-    }
-
-    public boolean delete(Season season) {
-        try (Connection connection = getConnection()) {
-            Statement statement = connection.createStatement();
-            statement.execute("CALL delete_season(" +
-                    season.getId() +
-                    ");");
-            return true;
-        }
-        catch (SQLException e) {
-            return false;
-        }
-    }
-
-    public boolean update(Series series, int number, String name, Date releaseDate, String torrent) {
-        try (Connection connection = getConnection()) {
-            Statement statement = connection.createStatement();
-            statement.execute("CALL update_series(" +
-                    series.getId() + ", " +
-                    number + ", " +
-                    "\"" + name + "\", " +
-                    "\"" + dateFormat.format(releaseDate) + "\", " +
-                    "\"" + torrent + "\"" +
-                    ");");
-            // TODO update in container (maybe)
-            return true;
-        }
-        catch (SQLException e) {
-            System.out.println(e);// TODO delete
             return false;
         }
     }
@@ -365,6 +365,32 @@ public class Database {
         }
         catch (SQLException e) {
             System.out.println(e); // TODO delete
+            return false;
+        }
+    }
+
+    public boolean delete(Serial serial) {
+        try (Connection connection = getConnection()) {
+            Statement statement = connection.createStatement();
+            statement.execute("CALL delete_serial(" +
+                    serial.getId() +
+                    ");");
+            return true;
+        }
+        catch (SQLException e) {
+            return false;
+        }
+    }
+
+    public boolean delete(Season season) {
+        try (Connection connection = getConnection()) {
+            Statement statement = connection.createStatement();
+            statement.execute("CALL delete_season(" +
+                    season.getId() +
+                    ");");
+            return true;
+        }
+        catch (SQLException e) {
             return false;
         }
     }

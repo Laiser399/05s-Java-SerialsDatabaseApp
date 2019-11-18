@@ -21,10 +21,9 @@ public class UserEditDialog extends Stage {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/editors/userEditor.fxml"));
             Parent root = loader.load();
             setScene(new Scene(root));
-            // TODO
             setMinWidth(300);
-            setMinHeight(256);
-            setMaxHeight(256);
+            setMinHeight(180);
+            setMaxHeight(180);
 
             controller = loader.getController();
             controller.init(this::onResult);

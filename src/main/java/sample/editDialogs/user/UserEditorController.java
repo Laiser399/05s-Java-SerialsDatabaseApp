@@ -22,6 +22,7 @@ public class UserEditorController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         roleChoiceBox.getItems().addAll(Database.Role.Guest, Database.Role.Editor);
+        roleChoiceBox.getSelectionModel().select(Database.Role.Guest);
     }
 
     public void init(Consumer<Optional<UserEditData> > onResult) {

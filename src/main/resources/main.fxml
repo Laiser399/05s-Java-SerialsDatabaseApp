@@ -135,7 +135,7 @@
                   <Pane prefHeight="200.0" prefWidth="200.0" />
                </children>
             </VBox>
-            <TabPane fx:id="databasePane" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" visible="false">
+            <TabPane fx:id="databaseTabPane" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" visible="false">
               <tabs>
                 <Tab text="База данных">
                      <content>
