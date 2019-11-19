@@ -6,11 +6,11 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import sample.Database;
+import sample.database.Database;
 import sample.Dialogs;
 import sample.editDialogs.user.UserEditData;
 import sample.editDialogs.user.UserEditDialog;
-import sample.records.User;
+import sample.database.records.User;
 
 import java.net.URL;
 import java.util.Optional;

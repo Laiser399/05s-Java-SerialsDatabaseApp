@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox xmlns="http://javafx.com/javafx/8.0.999-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.editDialogs.season.SeasonEditorController">
+<VBox xmlns="http://javafx.com/javafx/8.0.999-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.editDialogs.season.SeasonEditController">
    <children>
       <GridPane minHeight="-Infinity" minWidth="-Infinity" VBox.vgrow="ALWAYS">
         <columnConstraints>

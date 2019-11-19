@@ -10,10 +10,11 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import sample.controllers.*;
+import sample.database.Database;
 import sample.exceptions.AuthException;
 import sample.exceptions.ConnectTimeoutException;
-import sample.records.Season;
-import sample.records.Serial;
+import sample.database.records.Season;
+import sample.database.records.Serial;
 
 import java.io.IOException;
 import java.net.URL;

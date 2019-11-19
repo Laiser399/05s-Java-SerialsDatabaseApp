@@ -12,12 +12,12 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import sample.Database;
+import sample.database.Database;
 import sample.Dialogs;
 import sample.editDialogs.season.SeasonEditData;
-import sample.editDialogs.season.SeasonEditorDialog;
-import sample.records.Season;
-import sample.records.Serial;
+import sample.editDialogs.season.SeasonEditDialog;
+import sample.database.records.Season;
+import sample.database.records.Serial;
 
 import java.awt.*;
 import java.io.IOException;
@@ -35,7 +35,7 @@ public class SeasonsController implements Initializable {
     @FXML private TableView<Season> tableView;
     @FXML private TableColumn<Season, Integer> numberColumn, seriesCountColumn;
     @FXML private TableColumn<Season, String> torrentColumn;
-    private SeasonEditorDialog editorDialog = new SeasonEditorDialog();
+    private SeasonEditDialog editorDialog = new SeasonEditDialog();
     private Database database = null;
     private Runnable onBackPressed = null;
     private Consumer<Season> onSeasonSelected = null;

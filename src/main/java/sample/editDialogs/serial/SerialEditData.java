@@ -1,6 +1,6 @@
 package sample.editDialogs.serial;
 
-import sample.records.Genre;
+import sample.database.records.Genre;
 
 import java.util.List;
 

@@ -5,13 +5,13 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import sample.records.Genre;
+import sample.database.records.Genre;
 
 import java.io.IOException;
 import java.util.Optional;
 
 public class GenreEditDialog extends Stage {
-    private GenreEditorController controller;
+    private GenreEditController controller;
     private Optional<GenreEditData> result = Optional.empty();
 
     public GenreEditDialog() {

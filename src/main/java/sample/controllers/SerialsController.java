@@ -11,11 +11,11 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import sample.Database;
+import sample.database.Database;
 import sample.Dialogs;
-import sample.records.Serial;
+import sample.database.records.Serial;
 import sample.editDialogs.serial.SerialEditData;
-import sample.editDialogs.serial.SerialEditorDialog;
+import sample.editDialogs.serial.SerialEditDialog;
 
 import java.awt.*;
 import java.io.IOException;
@@ -32,7 +32,7 @@ public class SerialsController implements Initializable {
     @FXML private TableView<Serial> tableView;
     @FXML private TableColumn<Serial, String> nameColumn, officialSiteColumn, genreColumn;
     @FXML private TableColumn<Serial, Double> markColumn;
-    private SerialEditorDialog editorDialog = new SerialEditorDialog();;
+    private SerialEditDialog editorDialog = new SerialEditDialog();;
     private Consumer<Serial> onSerialSelected = null;
     private Database database = null;
 

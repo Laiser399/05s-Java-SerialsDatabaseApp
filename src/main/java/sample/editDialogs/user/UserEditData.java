@@ -1,6 +1,6 @@
 package sample.editDialogs.user;
 
-import sample.Database;
+import sample.database.Database;
 
 public class UserEditData {
     public String name, password;

@@ -1,24 +1,21 @@
 package sample.controllers;
 
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.TextField;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import sample.Database;
+import sample.database.Database;
 import sample.Dialogs;
 import sample.editDialogs.series.SeriesEditData;
-import sample.editDialogs.series.SeriesEditorDialog;
-import sample.records.Season;
-import sample.records.Serial;
-import sample.records.Series;
+import sample.editDialogs.series.SeriesEditDialog;
+import sample.database.records.Season;
+import sample.database.records.Serial;
+import sample.database.records.Series;
 
 import java.awt.*;
 import java.io.IOException;
@@ -38,7 +35,7 @@ public class SeriesController implements Initializable {
     private Database database = null;
     private Runnable onBackPressed = null;
     private Season currentSeason = null;
-    private SeriesEditorDialog editorDialog = new SeriesEditorDialog();
+    private SeriesEditDialog editorDialog = new SeriesEditDialog();
 
     // init
     @Override

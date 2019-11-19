@@ -5,13 +5,13 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import sample.records.User;
+import sample.database.records.User;
 
 import java.io.IOException;
 import java.util.Optional;
 
 public class UserEditDialog extends Stage {
-    private UserEditorController controller;
+    private UserEditController controller;
     private Optional<UserEditData> result = Optional.empty();
 
     public UserEditDialog() {

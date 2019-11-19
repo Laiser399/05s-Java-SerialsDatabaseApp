@@ -2,23 +2,69 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="cdb932d9-7e58-4d94-93a9-e7b232ef17da" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/sample/RunnableTask.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/sample/Database.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sample/Database.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/sample/Dialogs.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sample/Dialogs.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/sample/Database.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sample/database/Database.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/sample/MainController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sample/MainController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/sample/containers/GenresContainer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sample/containers/GenresContainer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/sample/containers/SeasonsContainer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sample/containers/SeasonsContainer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/sample/containers/SerialsContainer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sample/containers/SerialsContainer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/sample/containers/SeriesContainer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sample/containers/SeriesContainer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/sample/containers/GenresContainer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sample/database/containers/GenresContainer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/sample/containers/SeasonsContainer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sample/database/containers/SeasonsContainer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/sample/containers/SerialsContainer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sample/database/containers/SerialsContainer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/sample/containers/SeriesContainer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sample/database/containers/SeriesContainer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/sample/controllers/GenresController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sample/controllers/GenresController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/sample/controllers/SeasonsController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sample/controllers/SeasonsController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/sample/controllers/SerialsController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sample/controllers/SerialsController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/sample/controllers/SeriesController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sample/controllers/SeriesController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/sample/editDialogs/series/SeriesEditorController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sample/editDialogs/series/SeriesEditorController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/sample/records/Serial.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sample/records/Serial.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/sample/records/Series.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sample/records/Series.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/sample/Database.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/sample/Database.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/sample/controllers/UsersController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sample/controllers/UsersController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/sample/editDialogs/genre/GenreEditDialog.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sample/editDialogs/genre/GenreEditDialog.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/sample/editDialogs/genre/GenreEditorController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sample/editDialogs/genre/GenreEditorController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/sample/editDialogs/season/SeasonEditorController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sample/editDialogs/season/SeasonEditorController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/sample/editDialogs/season/SeasonEditorDialog.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sample/editDialogs/season/SeasonEditorDialog.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/sample/editDialogs/serial/SerialEditData.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sample/editDialogs/serial/SerialEditData.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/sample/editDialogs/serial/SerialEditorController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/sample/editDialogs/serial/SerialEditorDialog.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sample/editDialogs/serial/SerialEditDialog.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/sample/editDialogs/series/SeriesEditorController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sample/editDialogs/series/SeriesEditController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/sample/editDialogs/series/SeriesEditorDialog.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sample/editDialogs/series/SeriesEditDialog.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/sample/editDialogs/user/UserEditData.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sample/editDialogs/user/UserEditData.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/sample/editDialogs/user/UserEditDialog.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sample/editDialogs/user/UserEditDialog.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/sample/editDialogs/user/UserEditorController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sample/editDialogs/user/UserEditController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/sample/records/Genre.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sample/database/records/Genre.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/sample/records/Season.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sample/database/records/Season.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/sample/records/Serial.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sample/database/records/Serial.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/sample/records/Series.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sample/database/records/Series.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/sample/records/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sample/database/records/User.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/editors/serialEditor.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/editors/serialEditor.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/editors/seriesEditor.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/editors/seriesEditor.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/editors/userEditor.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/editors/userEditor.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/sample/Database$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/sample/Database$Role.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/sample/Database.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/sample/MainController$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/sample/MainController$1.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/sample/MainController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/sample/MainController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/sample/containers/GenresContainer.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/sample/containers/SeasonsContainer.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/sample/containers/SerialsContainer.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/sample/containers/SeriesContainer.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/sample/controllers/GenresController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/sample/controllers/GenresController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/sample/controllers/SeasonsController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/sample/controllers/SeasonsController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/sample/controllers/SerialsController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/sample/controllers/SerialsController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/sample/controllers/SeriesController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/sample/controllers/SeriesController.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/sample/controllers/UsersController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/sample/controllers/UsersController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/sample/records/Series.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/sample/records/Series.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/sample/records/User.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/sample/records/User.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/sample/editDialogs/genre/GenreEditDialog.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/sample/editDialogs/genre/GenreEditDialog.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/sample/editDialogs/genre/GenreEditorController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/sample/editDialogs/genre/GenreEditorController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/sample/editDialogs/season/SeasonEditorController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/sample/editDialogs/season/SeasonEditorController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/sample/editDialogs/season/SeasonEditorDialog.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/sample/editDialogs/season/SeasonEditorDialog.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/sample/editDialogs/serial/SerialEditData.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/sample/editDialogs/serial/SerialEditData.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/sample/editDialogs/serial/SerialEditorController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/sample/editDialogs/serial/SerialEditorController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/sample/editDialogs/serial/SerialEditorDialog.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/sample/editDialogs/serial/SerialEditorDialog.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/sample/editDialogs/series/SeriesEditorController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/sample/editDialogs/series/SeriesEditorController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/sample/editDialogs/series/SeriesEditorDialog.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/sample/editDialogs/series/SeriesEditorDialog.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/sample/editDialogs/user/UserEditData.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/sample/editDialogs/user/UserEditData.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/sample/editDialogs/user/UserEditDialog.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/sample/editDialogs/user/UserEditDialog.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/sample/editDialogs/user/UserEditorController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/sample/editDialogs/user/UserEditorController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/sample/records/Genre.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/sample/records/Season.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/sample/records/Serial.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/sample/records/Series.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/sample/records/User.class" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
