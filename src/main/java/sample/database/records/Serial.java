@@ -9,7 +9,8 @@ import javafx.collections.ObservableList;
 import java.util.List;
 
 public class Serial {
-    private int id;
+//    private int id;
+    private IntegerProperty id = new SimpleIntegerProperty();
     private StringProperty name = new SimpleStringProperty(),
                            officialSite = new SimpleStringProperty();
     private DoubleProperty mark = new SimpleDoubleProperty();
@@ -17,7 +18,7 @@ public class Serial {
     private ObservableList<Genre> genres = FXCollections.observableArrayList();
 
     public Serial(int id, String name, String officialSite, double mark, List<Genre> genres) {
-        this.id = id;
+        this.id.set(id);
         this.name.setValue(name);
         this.officialSite.setValue(officialSite);
         this.mark.setValue(mark);
@@ -37,7 +38,11 @@ public class Serial {
     }
 
     public int getId() {
-        return id;
+        return id.get();
+    }
+
+    public ObservableValue<Integer> idObservable() {
+        return id.asObject();
     }
 
     public ObservableValue<String> nameObservable() {

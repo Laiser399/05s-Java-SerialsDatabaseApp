@@ -9,7 +9,8 @@ import java.util.Date;
 public class Series {
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
 
-    private int id, idSeason;
+    private IntegerProperty id = new SimpleIntegerProperty();
+    private int idSeason;
     private IntegerProperty number = new SimpleIntegerProperty();
     private StringProperty name = new SimpleStringProperty();
     private StringProperty displayReleaseDate = new SimpleStringProperty();
@@ -20,7 +21,7 @@ public class Series {
         this.releaseDate.addListener((observable, oldValue, newValue) ->
                 updateDisplayReleaseDate());
 
-        this.id = id;
+        this.id.set(id);
         this.idSeason = idSeason;
         this.number.setValue(number);
         this.name.setValue(name);
@@ -33,11 +34,15 @@ public class Series {
     }
 
     public int getId() {
-        return id;
+        return id.get();
     }
 
     public int getIdSeason() {
         return idSeason;
+    }
+
+    public ObservableValue<Integer> idObservable() {
+        return id.asObject();
     }
 
     public ObservableValue<Integer> numberObservable() {

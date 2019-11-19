@@ -30,7 +30,7 @@ public class SeriesController implements Initializable {
     @FXML private TextField serialNameField, seasonNumberField;
     @FXML private HBox editBox;
     @FXML private TableView<Series> tableView;
-    @FXML private TableColumn<Series, Integer> numberColumn;
+    @FXML private TableColumn<Series, Integer> idColumn, numberColumn;
     @FXML private TableColumn<Series, String> nameColumn, releaseDateColumn, torrentColumn;
     private Database database = null;
     private Runnable onBackPressed = null;
@@ -40,6 +40,7 @@ public class SeriesController implements Initializable {
     // init
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        idColumn.setCellValueFactory(param -> param.getValue().idObservable());
         numberColumn.setCellValueFactory(param -> param.getValue().numberObservable());
         nameColumn.setCellValueFactory(param -> param.getValue().nameObservable());
         releaseDateColumn.setCellValueFactory(param -> param.getValue().displayReleaseDateObservable());

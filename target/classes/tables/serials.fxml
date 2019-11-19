@@ -41,7 +41,8 @@
       </HBox>
       <TableView fx:id="tableView" editable="true" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#onMouseClicked" prefHeight="140.0" prefWidth="340.0" VBox.vgrow="ALWAYS">
         <columns>
-          <TableColumn fx:id="nameColumn" prefWidth="73.0" text="Название" />
+            <TableColumn fx:id="idColumn" prefWidth="41.0" text="id" />
+          <TableColumn fx:id="nameColumn" prefWidth="98.0" text="Название" />
           <TableColumn fx:id="officialSiteColumn" prefWidth="163.0" text="Официальный сайт" />
             <TableColumn fx:id="markColumn" minWidth="-Infinity" prefWidth="50.0" text="Оценка" />
             <TableColumn fx:id="genreColumn" prefWidth="66.0" text="Жанры" />

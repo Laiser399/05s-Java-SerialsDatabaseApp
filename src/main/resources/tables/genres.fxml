@@ -29,6 +29,7 @@
       </HBox>
       <TableView fx:id="tableView" prefHeight="200.0" VBox.vgrow="ALWAYS">
         <columns>
+            <TableColumn fx:id="idColumn" prefWidth="75.0" text="id" />
           <TableColumn fx:id="nameColumn" prefWidth="75.0" text="Название" />
         </columns>
          <columnResizePolicy>

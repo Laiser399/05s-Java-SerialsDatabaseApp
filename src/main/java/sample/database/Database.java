@@ -294,10 +294,7 @@ public class Database {
 
     private void applyStgChange(int idSerial, int idGenre, String type) {
         Serial serial = serials.getById(idSerial).orElse(null);
-        if (serial == null) {
-            System.out.println("Wrong serial id.");
-            return;
-        }
+        if (serial == null) return;
 
         switch (type) {
             case "insert":

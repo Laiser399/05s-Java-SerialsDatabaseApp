@@ -30,6 +30,7 @@ public class SerialsController implements Initializable {
     @FXML private VBox root;
     @FXML private HBox editBox;
     @FXML private TableView<Serial> tableView;
+    @FXML private TableColumn<Serial, Integer> idColumn;
     @FXML private TableColumn<Serial, String> nameColumn, officialSiteColumn, genreColumn;
     @FXML private TableColumn<Serial, Double> markColumn;
     private SerialEditDialog editorDialog = new SerialEditDialog();;
@@ -39,6 +40,7 @@ public class SerialsController implements Initializable {
     // init
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        idColumn.setCellValueFactory(param -> param.getValue().idObservable());
         nameColumn.setCellValueFactory(param -> param.getValue().nameObservable());
         officialSiteColumn.setCellValueFactory(param -> param.getValue().officialSiteObservable());
         markColumn.setCellValueFactory(param -> param.getValue().markObservable());

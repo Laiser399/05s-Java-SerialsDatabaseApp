@@ -33,7 +33,7 @@ public class SeasonsController implements Initializable {
     @FXML private TextField serialNameField;
     @FXML private HBox editBox;
     @FXML private TableView<Season> tableView;
-    @FXML private TableColumn<Season, Integer> numberColumn, seriesCountColumn;
+    @FXML private TableColumn<Season, Integer> idColumn, numberColumn, seriesCountColumn;
     @FXML private TableColumn<Season, String> torrentColumn;
     private SeasonEditDialog editorDialog = new SeasonEditDialog();
     private Database database = null;
@@ -44,6 +44,7 @@ public class SeasonsController implements Initializable {
     // init
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        idColumn.setCellValueFactory(param -> param.getValue().idObservable());
         numberColumn.setCellValueFactory(param -> param.getValue().numberObservable());
         seriesCountColumn.setCellValueFactory(param -> param.getValue().seriesCountObservable());
         torrentColumn.setCellValueFactory(param -> param.getValue().torrentLinkObservable());

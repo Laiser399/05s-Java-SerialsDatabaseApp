@@ -18,6 +18,7 @@ import java.util.ResourceBundle;
 
 public class GenresController implements Initializable {
     @FXML private TableView<Genre> tableView;
+    @FXML private TableColumn<Genre, Integer> idColumn;
     @FXML private TableColumn<Genre, String> nameColumn;
     private Database database = null;
     private GenreEditDialog editDialog = new GenreEditDialog();
@@ -25,6 +26,7 @@ public class GenresController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        idColumn.setCellValueFactory(param -> param.getValue().idObservable());
         nameColumn.setCellValueFactory(param -> param.getValue().nameObservable());
     }
 

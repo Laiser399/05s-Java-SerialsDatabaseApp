@@ -7,14 +7,15 @@ import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
 
 public class Season {
-    private int id, idSerial;
+    private IntegerProperty id = new SimpleIntegerProperty();
+    private int idSerial;
     private IntegerProperty number = new SimpleIntegerProperty(),
                             seriesCount = new SimpleIntegerProperty();
     private StringProperty torrentLink = new SimpleStringProperty();
 
 
     public Season(int id, int idSerial, int number, int seriesCount, String torrentLink) {
-        this.id = id;
+        this.id.set(id);
         this.idSerial = idSerial;
         this.number.setValue(number);
         this.seriesCount.setValue(seriesCount);
@@ -22,11 +23,15 @@ public class Season {
     }
 
     public int getId() {
-        return id;
+        return id.get();
     }
 
     public int getIdSerial() {
         return idSerial;
+    }
+
+    public ObservableValue<Integer> idObservable() {
+        return id.asObject();
     }
 
     public ObservableValue<Integer> numberObservable() {
