@@ -15,7 +15,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Timer;
 
+// TODO check updates in users
 public class Database {
     public enum Role {
         Guest("Гость"), Editor("Редактор"), Superuser("Царь");
@@ -35,11 +37,13 @@ public class Database {
     private Role role = Role.Guest;
     private String host, login, password;
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    private int lastMainChangeId = 0, lastStgChangeId = 0;
     private GenresContainer genres = new GenresContainer();
     private SerialsContainer serials = new SerialsContainer();
     private SeasonsContainer seasons = new SeasonsContainer();
-    private SeriesContainer seriesContainer = new SeriesContainer();
+    private SeriesContainer series = new SeriesContainer();
     private ObservableList<User> users = FXCollections.observableArrayList();
+
 
     // init
     public Database(String host, String login, String password) throws ConnectTimeoutException, AuthException {
@@ -54,6 +58,10 @@ public class Database {
             initSeries(connection);
             initRole(connection);
             initUsersIfNeed(connection);
+            initLastChangeIds(connection);
+
+            Timer timer = new Timer(true);
+            timer.schedule(new RunnableTask(this::checkUpdates), 0, 1000);
         }
         catch (SQLTimeoutException e) {
             throw new ConnectTimeoutException();
@@ -76,7 +84,7 @@ public class Database {
             while (result.next()) {
                 int id = result.getInt("id");
                 String name = result.getString("name");
-                genres.add(new Genre(id, name));
+                genres.addOrUpdate(id, name);
             }
         }
     }
@@ -92,7 +100,7 @@ public class Database {
                 double mark = result.getDouble("mark");
 
                 List<Genre> genres = getSerialGenres(id, connection);
-                serials.add(new Serial(id, name, officialSite, mark, genres));
+                serials.addOrUpdate(id, name, officialSite, mark, genres);
             }
         }
     }
@@ -108,7 +116,7 @@ public class Database {
                 int seriesCount = result.getInt("series_count");
                 String torrentLink = result.getString("torrent_link");
 
-                seasons.add(new Season(id, idSerial, number, seriesCount, torrentLink));
+                seasons.addOrUpdate(id, idSerial, number, seriesCount, torrentLink);
             }
         }
     }
@@ -125,7 +133,7 @@ public class Database {
                 Date releaseDate = result.getDate("release_date");
                 String torrentLink = result.getString("torrent_link");
 
-                seriesContainer.add(new Series(id, idSeason, number, name, releaseDate, torrentLink));
+                series.addOrUpdate(id, idSeason, number, name, releaseDate, torrentLink);
             }
         }
     }
@@ -170,9 +178,145 @@ public class Database {
         }
     }
 
+    private void initLastChangeIds(Connection connection) throws SQLException {
+        Statement statement = connection.createStatement();
+        statement.execute("CALL get_last_change_ids();");
+        ResultSet result = statement.getResultSet();
+        while (result.next()) {
+            lastMainChangeId = result.getInt("id_main");
+            lastStgChangeId = result.getInt("id_stg");
+        }
+    }
+
     // methods
     public Role getRole() {
         return role;
+    }
+
+    private void checkUpdates() {
+        try (Connection connection = getConnection()) {
+            checkMainUpdates(connection);
+            checkStgUpdates(connection);
+        }
+        catch (SQLException e) {
+            System.out.println("Error check updates: " + e.getMessage());
+        }
+    }
+
+    private void checkMainUpdates(Connection connection) throws SQLException {
+        Statement statement = connection.createStatement();
+        statement.execute("CALL get_changes_after(" +
+                lastMainChangeId +
+                ");");
+        ResultSet result = statement.getResultSet();
+        while (result.next()) {
+            lastMainChangeId = result.getInt("id");
+            String tableName = result.getString("table_name");
+            int id = result.getInt("id_row");
+            applyMainChange(connection, tableName, id);
+        }
+    }
+
+    private void checkStgUpdates(Connection connection) throws SQLException {
+        Statement statement = connection.createStatement();
+        statement.execute("CALL get_stg_changes_after(" +
+                lastStgChangeId +
+                ");");
+        ResultSet result = statement.getResultSet();
+        while (result.next()) {
+            lastStgChangeId = result.getInt("id");
+            int idSerial = result.getInt("id_serial");
+            int idGenre = result.getInt("id_genre");
+            String type = result.getString("type");
+            applyStgChange(idSerial, idGenre, type);
+        }
+    }
+
+    private void applyMainChange(Connection connection, String tableName, int id) throws SQLException {
+        switch (tableName) {
+            case "genre":  applyGenreChange(connection, id); break;
+            case "serial": applySerialChange(connection, id); break;
+            case "season": applySeasonChange(connection, id); break;
+            case "series": applySeriesChange(connection, id); break;
+        }
+    }
+
+    private void applyGenreChange(Connection connection, int id) throws SQLException {
+        Statement statement = connection.createStatement();
+        statement.execute("CALL get_genre_by_id(" + id + ");");
+        ResultSet result = statement.getResultSet();
+        if (result.next()) {
+            String name = result.getString("name");
+            genres.addOrUpdate(id, name);
+        }
+        else {
+            genres.remove(id);
+        }
+    }
+
+    private void applySerialChange(Connection connection, int id) throws SQLException {
+        Statement statement = connection.createStatement();
+        statement.execute("CALL get_serial_by_id(" + id + ");");
+        ResultSet result = statement.getResultSet();
+        if (result.next()) {
+            String name = result.getString("name");
+            String offSite = result.getString("official_site");
+            double mark = result.getDouble("mark");
+            serials.addOrUpdate(id, name, offSite, mark);
+        }
+        else {
+            serials.remove(id);
+        }
+    }
+
+    private void applySeasonChange(Connection connection, int id) throws SQLException {
+        Statement statement = connection.createStatement();
+        statement.execute("CALL get_season_by_id(" + id + ");");
+        ResultSet result = statement.getResultSet();
+        if (result.next()) {
+            int idSerial = result.getInt("id_serial");
+            int number = result.getInt("number");
+            int seriesCount = result.getInt("series_count");
+            String torrent = result.getString("torrent_link");
+            seasons.addOrUpdate(id, idSerial, number, seriesCount, torrent);
+        }
+        else {
+            seasons.remove(id);
+        }
+    }
+
+    private void applySeriesChange(Connection connection, int id) throws SQLException {
+        Statement statement = connection.createStatement();
+        statement.execute("CALL get_series_by_id(" + id + ");");
+        ResultSet result = statement.getResultSet();
+        if (result.next()) {
+            int idSeason = result.getInt("id_season");
+            int number = result.getInt("number");
+            String name = result.getString("name");
+            Date releaseDate = result.getDate("release_date");
+            String torrent = result.getString("torrent_link");
+            series.addOrUpdate(id, idSeason, number, name, releaseDate, torrent);
+        }
+        else {
+            series.remove(id);
+        }
+    }
+
+    private void applyStgChange(int idSerial, int idGenre, String type) {
+        Serial serial = serials.getById(idSerial).orElse(null);
+        if (serial == null) {
+            System.out.println("Wrong serial id.");
+            return;
+        }
+
+        switch (type) {
+            case "insert":
+                genres.getById(idGenre).ifPresent(serial::addGenre);
+                break;
+            case "delete":
+                serial.removeGenre(idGenre);
+                break;
+        }
     }
 
     // observable
@@ -182,7 +326,8 @@ public class Database {
         if (genresStatement.execute("CALL get_genres_id_for(" + idSerial + ");")) {
             ResultSet resultIds = genresStatement.getResultSet();
             while (resultIds.next()) {
-                result.add(genres.getById(resultIds.getInt("id_genre")));
+                int idGenre = resultIds.getInt("id_genre");
+                genres.getById(idGenre).ifPresent(result::add);
             }
         }
         return result;
@@ -201,7 +346,7 @@ public class Database {
     }
 
     public ObservableList<Series> getSeriesFor(int seasonId) {
-        return seriesContainer.getBySeasonId(seasonId);
+        return series.getBySeasonId(seasonId);
     }
 
     public ObservableList<User> getUsers() {
@@ -284,7 +429,6 @@ public class Database {
             return true;
         }
         catch (SQLException e) {
-            System.out.println(e);// TODO delete
             return false;
         }
     }
@@ -301,7 +445,6 @@ public class Database {
             return true;
         }
         catch (SQLException e) {
-            System.out.println(e); // TODO delete
             return false;
         }
     }
@@ -328,12 +471,9 @@ public class Database {
                             ");");
                 }
                 connection.commit();
-
-                // TODO (maybe) insert into container
                 return true;
             }
             catch (SQLException e) {
-                System.out.println(e);
                 connection.rollback();
                 return false;
             }
@@ -353,16 +493,9 @@ public class Database {
                     seriesCount + ", " +
                     "\"" + torrent + "\"" +
                     ");");
-//            ResultSet result = statement.getResultSet();
-//            int idSeason = 0;
-//            while (result.next())
-//                idSeason = result.getInt(1);
-            // TODO add to seasons container
-
             return true;
         }
         catch (SQLException e) {
-            System.out.println(e); // TODO delete
             return false;
         }
     }
@@ -377,17 +510,9 @@ public class Database {
                     "\"" + dateFormat.format(releaseDate) + "\", " +
                     "\"" + torrent + "\"" +
                     ");");
-            ResultSet result = statement.getResultSet();
-            int idInserted = 0;
-            while (result.next())
-                idInserted = result.getInt(1);
-            // TODO insert into container (maybe)
-
-
             return true;
         }
         catch (SQLException e) {
-            System.out.println(e); // TODO delete
             return false;
         }
     }
@@ -398,11 +523,9 @@ public class Database {
             statement.execute("CALL create_genre(" +
                     "\"" + name + "\"" +
                     ");");
-            // TODO insert into container (maybe)
             return true;
         }
         catch (SQLException e) {
-            System.out.println(e); // TODO delete
             return false;
         }
     }
@@ -413,8 +536,6 @@ public class Database {
             statement.execute("CALL delete_serial(" +
                     serial.getId() +
                     ");");
-
-            // TODO (maybe) del from container
             return true;
         }
         catch (SQLException e) {
@@ -428,8 +549,6 @@ public class Database {
             statement.execute("CALL delete_season(" +
                     season.getId() +
                     ");");
-
-            // TODO (maybe) del from container
             return true;
         }
         catch (SQLException e) {
@@ -443,11 +562,9 @@ public class Database {
             statement.execute("CALL delete_series(" +
                     series.getId() +
                     ");");
-            // TODO delete from container (maybe)
             return true;
         }
         catch (SQLException e) {
-            System.out.println(e); // TODO delete
             return false;
         }
     }
@@ -458,12 +575,9 @@ public class Database {
             statement.execute("CALL delete_genre(" +
                     genre.getId() +
                     ");");
-
-            // TODO (maybe) delete from container
             return true;
         }
         catch (SQLException e) {
-            System.out.println(e); // TODO delete
             return false;
         }
     }
@@ -479,7 +593,6 @@ public class Database {
             return true;
         }
         catch (SQLException e) {
-            System.out.println(e);//TODO delete
             return false;
         }
     }
@@ -504,7 +617,6 @@ public class Database {
             return true;
         }
         catch (SQLException e) {
-            System.out.println(e);//TODO delete
             return false;
         }
     }
@@ -526,11 +638,9 @@ public class Database {
                 default:
                     return false;
             }
-
             return true;
         }
         catch (SQLException e) {
-            System.out.println(e);//TODO delete
             return false;
         }
     }
@@ -544,7 +654,6 @@ public class Database {
             return true;
         }
         catch (SQLException e) {
-            System.out.println(e); //TODO delete
             return false;
         }
     }

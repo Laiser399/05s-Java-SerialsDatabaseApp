@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-
+// TODO menu bar and window title
 public class MainController implements Initializable {
     //auth
     @FXML private VBox authPane;
@@ -121,7 +121,7 @@ public class MainController implements Initializable {
         setEditableMainControllers(true);
 
         genresTab.setDisable(false);
-        if (!databaseTabPane.getTabs().contains(genresTab))// TODO maybe without if contains
+        if (!databaseTabPane.getTabs().contains(genresTab))
             databaseTabPane.getTabs().add(genresTab);
 
         usersTab.setDisable(false);

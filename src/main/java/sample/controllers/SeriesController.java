@@ -28,7 +28,6 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 
 
-// TODO мб сделать добавление/удаление в create/delete
 public class SeriesController implements Initializable {
     @FXML private VBox root;
     @FXML private TextField serialNameField, seasonNumberField;

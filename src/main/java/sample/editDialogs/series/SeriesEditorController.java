@@ -12,7 +12,6 @@ import java.util.Date;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-// TODO TextField -> some control for int for number and others
 public class SeriesEditorController {
     @FXML private TextField idField, idSeasonField, numberField, nameField, torrentField;
     @FXML private DatePicker releaseDatePicker;

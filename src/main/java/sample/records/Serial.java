@@ -26,6 +26,16 @@ public class Serial {
         this.genres.addListener((ListChangeListener<? super Genre>) c -> updateDisplayGenres());
     }
 
+    private void updateDisplayGenres() {
+        StringBuilder builder = new StringBuilder();
+        for (Genre genre : genres) {
+            if (builder.length() > 0)
+                builder.append(", ");
+            builder.append(genre.nameObservable().getValue());
+        }
+        displayGenres.setValue(builder.toString());
+    }
+
     public int getId() {
         return id;
     }
@@ -67,13 +77,13 @@ public class Serial {
         this.genres.addAll(genres);
     }
 
-    private void updateDisplayGenres() {
-        StringBuilder builder = new StringBuilder();
-        for (Genre genre : genres) {
-            if (builder.length() > 0)
-                builder.append(", ");
-            builder.append(genre.nameObservable().getValue());
-        }
-        displayGenres.setValue(builder.toString());
+    public void addGenre(Genre genre) {
+        if (!genres.contains(genre))
+            genres.add(genre);
     }
+
+    public void removeGenre(int idGenre) {
+        genres.removeIf(genre -> idGenre == genre.getId());
+    }
+
 }

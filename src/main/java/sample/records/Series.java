@@ -3,9 +3,12 @@ package sample.records;
 import javafx.beans.property.*;
 import javafx.beans.value.ObservableValue;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Series {
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+
     private int id, idSeason;
     private IntegerProperty number = new SimpleIntegerProperty();
     private StringProperty name = new SimpleStringProperty();
@@ -14,19 +17,19 @@ public class Series {
     private StringProperty torrentLink = new SimpleStringProperty();
 
     public Series(int id, int idSeason, int number, String name, Date releaseDate, String torrent) {
+        this.releaseDate.addListener((observable, oldValue, newValue) ->
+                updateDisplayReleaseDate());
+
         this.id = id;
         this.idSeason = idSeason;
         this.number.setValue(number);
         this.name.setValue(name);
         this.releaseDate.setValue(releaseDate);
         this.torrentLink.setValue(torrent);
-
-        this.releaseDate.addListener((observable, oldValue, newValue) -> updateDisplayReleaseDate());
-        updateDisplayReleaseDate();
     }
 
     private void updateDisplayReleaseDate() {
-        displayReleaseDate.setValue(releaseDate.getValue().toString());
+        displayReleaseDate.setValue(dateFormat.format(releaseDate.getValue()));
     }
 
     public int getId() {
