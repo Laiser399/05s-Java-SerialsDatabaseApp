@@ -26,13 +26,11 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
         Parent root = FXMLLoader.load(getClass().getResource("/main.fxml"));
-        primaryStage.setTitle("Hello World");
+        primaryStage.setTitle("БД сериалов");
         primaryStage.setScene(new Scene(root, 300, 275));
         primaryStage.setMinWidth(440);
         primaryStage.setMinHeight(440);
         primaryStage.show();
-
-
     }
 
 

@@ -38,7 +38,7 @@ public class GenresContainer {
         return Optional.ofNullable(genresById.get(id));
     }
 
-    public ObservableList<Genre> getGenres() {
+    public ObservableList<Genre> getGenresObservable() {
         return genres;
     }
 

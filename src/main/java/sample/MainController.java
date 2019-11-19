@@ -4,6 +4,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
@@ -29,6 +30,7 @@ public class MainController implements Initializable {
     @FXML private TabPane databaseTabPane;
     @FXML private StackPane tablesStackPane;
     @FXML private Tab genresTab, usersTab;
+    private Database database = null;
     private SerialsController serialsController;
     private SeasonsController seasonsController;
     private SeriesController seriesController;
@@ -162,7 +164,7 @@ public class MainController implements Initializable {
     // auth events
     @FXML private void onEnter() {
         try {
-            Database database = new Database(hostField.getText(), loginField.getText(),
+            database = new Database(hostField.getText(), loginField.getText(),
                     passwordField.getText());
             serialsController.setDatabase(database);
             seasonsController.setDatabase(database);
@@ -205,7 +207,25 @@ public class MainController implements Initializable {
     }
 
     // menu bar
-    @FXML private void onTest() {
+    @FXML private void onChangeUser() {
+        if (database != null)
+            database.close();
+        database = null;
 
+        databaseTabPane.setVisible(false);
+        authPane.setVisible(true);
     }
+
+    @FXML private void onExit() {
+        System.exit(0);
+    }
+
+    @FXML private void onAuthor() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION, "Студент МАИ\n" +
+                "Группы М8О-313Б-17\nСеменов Сергей");
+        alert.setTitle("( ͡° ͜ʖ ͡°)");
+        alert.setHeaderText("Автор");
+        alert.showAndWait();
+    }
+
 }

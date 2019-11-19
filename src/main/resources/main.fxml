@@ -24,11 +24,17 @@
    <top>
       <MenuBar BorderPane.alignment="CENTER">
         <menus>
-          <Menu mnemonicParsing="false" text="File">
+          <Menu mnemonicParsing="false" text="Файл">
             <items>
-              <MenuItem mnemonicParsing="false" onAction="#onTest" text="test" />
+                  <MenuItem mnemonicParsing="false" onAction="#onChangeUser" text="Сменить пользователя" />
+              <MenuItem mnemonicParsing="false" onAction="#onExit" text="Выход" />
             </items>
           </Menu>
+            <Menu mnemonicParsing="false" text="?">
+              <items>
+                <MenuItem mnemonicParsing="false" onAction="#onAuthor" text="Автор" />
+              </items>
+            </Menu>
         </menus>
       </MenuBar>
    </top>

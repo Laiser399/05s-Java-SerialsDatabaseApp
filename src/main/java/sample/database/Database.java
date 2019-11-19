@@ -1,24 +1,17 @@
 package sample.database;
 
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import sample.RunnableTask;
-import sample.database.containers.GenresContainer;
-import sample.database.containers.SeasonsContainer;
-import sample.database.containers.SerialsContainer;
-import sample.database.containers.SeriesContainer;
+import sample.database.containers.*;
 import sample.exceptions.AuthException;
 import sample.exceptions.ConnectTimeoutException;
 import sample.database.records.*;
 
 import java.sql.*;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.Date;
-import java.util.List;
-import java.util.Timer;
 
-// TODO check updates in users
 public class Database {
     public enum Role {
         Guest("Гость"), Editor("Редактор"), Superuser("Царь");
@@ -39,11 +32,12 @@ public class Database {
     private String host, login, password;
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     private int lastMainChangeId = 0, lastStgChangeId = 0;
+    private Timer timer = new Timer(true);
     private GenresContainer genres = new GenresContainer();
     private SerialsContainer serials = new SerialsContainer();
     private SeasonsContainer seasons = new SeasonsContainer();
     private SeriesContainer series = new SeriesContainer();
-    private ObservableList<User> users = FXCollections.observableArrayList();
+    private UsersContainer users = new UsersContainer();
 
 
     // init
@@ -58,17 +52,27 @@ public class Database {
             initSeasons(connection);
             initSeries(connection);
             initRole(connection);
-            initUsersIfNeed(connection);
+            initUsersIfNeed();
             initLastChangeIds(connection);
 
-            Timer timer = new Timer(true);
             timer.schedule(new RunnableTask(this::checkUpdates), 0, 1000);
+
+            if (role == Role.Superuser) {
+                timer.schedule(new RunnableTask(this::checkUsersUpdates), 0, 5000);
+            }
         }
         catch (SQLTimeoutException e) {
             throw new ConnectTimeoutException();
         }
         catch (SQLException e) {
             throw new AuthException();
+        }
+    }
+
+    public void close() {
+        if (timer != null) {
+            timer.cancel();
+            timer = null;
         }
     }
 
@@ -157,26 +161,10 @@ public class Database {
         }
     }
 
-    private void initUsersIfNeed(Connection connection) throws SQLException {
+    private void initUsersIfNeed() {
         if (role != Role.Superuser)
             return;
-
-        Statement statement = connection.createStatement();
-        statement.execute("CALL get_common_users();");
-        ResultSet result = statement.getResultSet();
-        while (result.next()) {
-            String name = result.getString("user");
-            Role role = null;
-            switch (result.getString("role")) {
-                case "guest": role = Role.Guest; break;
-                case "editor": role = Role.Editor; break;
-                case "superuser": role = Role.Superuser; break;
-            }
-            if (role == null)
-                break;
-
-            users.add(new User(name, role));
-        }
+        checkUsersUpdates();
     }
 
     private void initLastChangeIds(Connection connection) throws SQLException {
@@ -194,6 +182,7 @@ public class Database {
         return role;
     }
 
+    // check db updates
     private void checkUpdates() {
         try (Connection connection = getConnection()) {
             checkMainUpdates(connection);
@@ -320,6 +309,34 @@ public class Database {
         }
     }
 
+    // check users updates
+    private void checkUsersUpdates() {
+        Set<String> validNames = new HashSet<>();
+        try (Connection connection = getConnection()) {
+            Statement statement = connection.createStatement();
+            statement.execute("CALL get_common_users();");
+            ResultSet result = statement.getResultSet();
+            while (result.next()) {
+                String name = result.getString("user");
+                Role role = null;
+                switch (result.getString("role")) {
+                    case "guest": role = Role.Guest; break;
+                    case "editor": role = Role.Editor; break;
+                    case "superuser": role = Role.Superuser; break;
+                }
+                if (role == null)
+                    continue;
+
+                validNames.add(name);
+                users.addOrUpdate(name, role);
+            }
+            users.retainWithNames(validNames);
+        }
+        catch (SQLException e) {
+            System.out.println("Error check users updates: " + e.getMessage());
+        }
+    }
+
     // observable
     private List<Genre> getSerialGenres(int idSerial, Connection connection) throws SQLException {
         Statement genresStatement = connection.createStatement();
@@ -335,7 +352,7 @@ public class Database {
     }
 
     public ObservableList<Genre> getGenres() {
-        return genres.getGenres();
+        return genres.getGenresObservable();
     }
 
     public ObservableList<Serial> getSerials() {
@@ -351,7 +368,7 @@ public class Database {
     }
 
     public ObservableList<User> getUsers() {
-        return users;
+        return users.getUsersObservable();
     }
 
     // update, create, delete
@@ -472,6 +489,8 @@ public class Database {
                             ");");
                 }
                 connection.commit();
+
+                serials.addOrUpdate(idSerial, name, officialSite, mark, genres);
                 return true;
             }
             catch (SQLException e) {
@@ -494,6 +513,11 @@ public class Database {
                     seriesCount + ", " +
                     "\"" + torrent + "\"" +
                     ");");
+            int id = 0;
+            ResultSet result = statement.getResultSet();
+            if (result.next()) id = result.getInt(1);
+
+            seasons.addOrUpdate(id, owner.getId(), number, seriesCount, torrent);
             return true;
         }
         catch (SQLException e) {
@@ -511,6 +535,11 @@ public class Database {
                     "\"" + dateFormat.format(releaseDate) + "\", " +
                     "\"" + torrent + "\"" +
                     ");");
+            int id = 0;
+            ResultSet result = statement.getResultSet();
+            if (result.next()) id = result.getInt(1);
+
+            series.addOrUpdate(id, owner.getId(), number, name, releaseDate, torrent);
             return true;
         }
         catch (SQLException e) {
@@ -524,6 +553,11 @@ public class Database {
             statement.execute("CALL create_genre(" +
                     "\"" + name + "\"" +
                     ");");
+            int id = 0;
+            ResultSet result = statement.getResultSet();
+            if (result.next()) id = result.getInt(1);
+
+            genres.addOrUpdate(id, name);
             return true;
         }
         catch (SQLException e) {
@@ -537,6 +571,8 @@ public class Database {
             statement.execute("CALL delete_serial(" +
                     serial.getId() +
                     ");");
+
+            serials.remove(serial.getId());
             return true;
         }
         catch (SQLException e) {
@@ -550,6 +586,8 @@ public class Database {
             statement.execute("CALL delete_season(" +
                     season.getId() +
                     ");");
+
+            seasons.remove(season.getId());
             return true;
         }
         catch (SQLException e) {
@@ -563,6 +601,8 @@ public class Database {
             statement.execute("CALL delete_series(" +
                     series.getId() +
                     ");");
+
+            this.series.remove(series.getId());
             return true;
         }
         catch (SQLException e) {
@@ -576,6 +616,8 @@ public class Database {
             statement.execute("CALL delete_genre(" +
                     genre.getId() +
                     ");");
+
+            genres.remove(genre.getId());
             return true;
         }
         catch (SQLException e) {
@@ -639,6 +681,8 @@ public class Database {
                 default:
                     return false;
             }
+
+            users.addOrUpdate(name, role);
             return true;
         }
         catch (SQLException e) {
@@ -652,6 +696,8 @@ public class Database {
             statement.execute("CALL delete_user(" +
                     "\"" + user.nameObservable().getValue() + "\"" +
                     ");");
+
+            users.remove(user);
             return true;
         }
         catch (SQLException e) {
