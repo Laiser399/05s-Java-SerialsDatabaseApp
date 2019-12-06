@@ -23,8 +23,31 @@ public class Serial {
         this.officialSite.setValue(officialSite);
         this.mark.setValue(mark);
         this.genres.addAll(genres);
+        connectGenres(genres);
         updateDisplayGenres();
-        this.genres.addListener((ListChangeListener<? super Genre>) c -> updateDisplayGenres());
+        this.genres.addListener((ListChangeListener<? super Genre>) c -> {
+            updateDisplayGenres();
+            while (c.next()) {
+                if (c.wasAdded())
+                    connectGenres(c.getAddedSubList());
+                else if (c.wasRemoved())
+                    disconnectGenres(c.getRemoved());
+            }
+        });
+    }
+
+    private void connectGenres(List<? extends Genre> genres) {
+        for (Genre genre : genres)
+            genre.nameObservable().addListener(this::genresNameListener);
+    }
+
+    private void disconnectGenres(List<? extends Genre> genres) {
+        for (Genre genre : genres)
+            genre.nameObservable().removeListener(this::genresNameListener);
+    }
+
+    private void genresNameListener(ObservableValue<? extends String> observable, String oldVal, String newVal) {
+        updateDisplayGenres();
     }
 
     private void updateDisplayGenres() {

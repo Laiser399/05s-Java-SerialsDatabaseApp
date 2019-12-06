@@ -121,12 +121,11 @@ public class Database {
         PreparedStatement statement = connection.prepareStatement("CALL get_genres_id_for(?);");
         statement.setInt(1, idSerial);
         List<Genre> result = new ArrayList<>();
-        if (statement.execute()) {
-            ResultSet resultIds = statement.getResultSet();
-            while (resultIds.next()) {
-                int idGenre = resultIds.getInt("id_genre");
-                genres.getById(idGenre).ifPresent(result::add);
-            }
+        statement.execute();
+        ResultSet resultIds = statement.getResultSet();
+        while (resultIds.next()) {
+            int idGenre = resultIds.getInt("id_genre");
+            genres.getById(idGenre).ifPresent(result::add);
         }
         return result;
     }
@@ -215,13 +214,9 @@ public class Database {
     }
 
     private void checkMainUpdates(Connection connection) throws SQLException {
-//        PreparedStatement statement = connection.prepareStatement("CALL get_changes_after(?);");
-//        statement.setInt(1, lastMainChangeId);
-
-        Statement statement = connection.createStatement();
-        statement.execute("CALL get_changes_after(" +
-                lastMainChangeId +
-                ");");
+        PreparedStatement statement = connection.prepareStatement("CALL get_changes_after(?);");
+        statement.setInt(1, lastMainChangeId);
+        statement.execute();
         ResultSet result = statement.getResultSet();
         while (result.next()) {
             lastMainChangeId = result.getInt("id");
@@ -232,10 +227,9 @@ public class Database {
     }
 
     private void checkStgUpdates(Connection connection) throws SQLException {
-        Statement statement = connection.createStatement();
-        statement.execute("CALL get_stg_changes_after(" +
-                lastStgChangeId +
-                ");");
+        PreparedStatement statement = connection.prepareStatement("CALL get_stg_changes_after(?);");
+        statement.setInt(1, lastStgChangeId);
+        statement.execute();
         ResultSet result = statement.getResultSet();
         while (result.next()) {
             lastStgChangeId = result.getInt("id");
@@ -256,8 +250,9 @@ public class Database {
     }
 
     private void applyGenreChange(Connection connection, int id) throws SQLException {
-        Statement statement = connection.createStatement();
-        statement.execute("CALL get_genre_by_id(" + id + ");");
+        PreparedStatement statement = connection.prepareStatement("CALL get_genre_by_id(?);");
+        statement.setInt(1, id);
+        statement.execute();
         ResultSet result = statement.getResultSet();
         if (result.next()) {
             String name = result.getString("name");
@@ -269,8 +264,9 @@ public class Database {
     }
 
     private void applySerialChange(Connection connection, int id) throws SQLException {
-        Statement statement = connection.createStatement();
-        statement.execute("CALL get_serial_by_id(" + id + ");");
+        PreparedStatement statement = connection.prepareStatement("CALL get_serial_by_id(?);");
+        statement.setInt(1, id);
+        statement.execute();
         ResultSet result = statement.getResultSet();
         if (result.next()) {
             String name = result.getString("name");
@@ -284,8 +280,9 @@ public class Database {
     }
 
     private void applySeasonChange(Connection connection, int id) throws SQLException {
-        Statement statement = connection.createStatement();
-        statement.execute("CALL get_season_by_id(" + id + ");");
+        PreparedStatement statement = connection.prepareStatement("CALL get_season_by_id(?);");
+        statement.setInt(1, id);
+        statement.execute();
         ResultSet result = statement.getResultSet();
         if (result.next()) {
             int idSerial = result.getInt("id_serial");
@@ -300,8 +297,9 @@ public class Database {
     }
 
     private void applySeriesChange(Connection connection, int id) throws SQLException {
-        Statement statement = connection.createStatement();
-        statement.execute("CALL get_series_by_id(" + id + ");");
+        PreparedStatement statement = connection.prepareStatement("CALL get_series_by_id(?);");
+        statement.setInt(1, id);
+        statement.execute();
         ResultSet result = statement.getResultSet();
         if (result.next()) {
             int idSeason = result.getInt("id_season");
@@ -391,21 +389,29 @@ public class Database {
     public boolean update(Serial serial, String name, String officialSite, double mark, List<Genre> genres) {
         try (Connection connection = getConnection()) {
             connection.setAutoCommit(false);
-            Statement statement = connection.createStatement();
+
+            PreparedStatement updateStatement =
+                    connection.prepareStatement("CALL update_serial(?, ?, ?, ?);");
+            PreparedStatement clearGenresStatement =
+                    connection.prepareStatement("CALL clear_genres(?);");
+            PreparedStatement addGenreStatement =
+                    connection.prepareStatement("CALL add_genre_to_serial(?, ?);");
             try {
-                statement.execute("CALL update_serial(" +
-                        serial.getId() + ", " +
-                        "\"" + name + "\", " +
-                        "\"" + officialSite + "\", " +
-                        mark +
-                        ");");
-                statement.execute("CALL clear_genres(" + serial.getId() + ");");
+                updateStatement.setInt(1, serial.getId());
+                updateStatement.setString(2, name);
+                updateStatement.setString(3, officialSite);
+                updateStatement.setDouble(4, mark);
+                updateStatement.execute();
+
+                clearGenresStatement.setInt(1, serial.getId());
+                clearGenresStatement.execute();
                 for (Genre genre : genres) {
-                    statement.execute("CALL add_genre_to_serial(" +
-                            serial.getId() + ", " +
-                            genre.getId() +
-                            ");");
+                    addGenreStatement.setInt(1, serial.getId());
+                    addGenreStatement.setInt(2, genre.getId());
+                    addGenreStatement.addBatch();
                 }
+                addGenreStatement.executeBatch();
+
                 connection.commit();
 
                 serial.setName(name);
@@ -427,13 +433,13 @@ public class Database {
 
     public boolean update(Season season, int number, int seriesCount, String torrent) {
         try (Connection connection = getConnection()) {
-            Statement statement = connection.createStatement();
-            statement.execute("CALL update_season(" +
-                    season.getId() + ", " +
-                    number + ", " +
-                    seriesCount + ", " +
-                    "\"" + torrent + "\"" +
-                    ");");
+            PreparedStatement statement =
+                    connection.prepareStatement("CALL update_season(?, ?, ?, ?);");
+            statement.setInt(1, season.getId());
+            statement.setInt(2, number);
+            statement.setInt(3, seriesCount);
+            statement.setString(4, torrent);
+            statement.execute();
 
             season.setNumber(number);
             season.setSeriesCount(seriesCount);
@@ -447,14 +453,14 @@ public class Database {
 
     public boolean update(Series series, int number, String name, Date releaseDate, String torrent) {
         try (Connection connection = getConnection()) {
-            Statement statement = connection.createStatement();
-            statement.execute("CALL update_series(" +
-                    series.getId() + ", " +
-                    number + ", " +
-                    "\"" + name + "\", " +
-                    "\"" + dateFormat.format(releaseDate) + "\", " +
-                    "\"" + torrent + "\"" +
-                    ");");
+            PreparedStatement statement =
+                    connection.prepareStatement("CALL update_series(?, ?, ?, ?, ?);");
+            statement.setInt(1, series.getId());
+            statement.setInt(2, number);
+            statement.setString(3, name);
+            statement.setString(4, dateFormat.format(releaseDate));// TODO check
+            statement.setString(5, torrent);
+            statement.execute();
 
             series.setNumber(number);
             series.setName(name);
@@ -469,11 +475,11 @@ public class Database {
 
     public boolean update(Genre genre, String name) {
         try (Connection connection = getConnection()) {
-            Statement statement = connection.createStatement();
-            statement.execute("CALL update_genre(" +
-                    genre.getId() + ", " +
-                    "\"" + name + "\"" +
-                    ");");
+            PreparedStatement statement =
+                    connection.prepareStatement("CALL update_genre(?, ?);");
+            statement.setInt(1, genre.getId());
+            statement.setString(2, name);
+            statement.execute();
 
             genre.setName(name);
             return true;
@@ -486,24 +492,29 @@ public class Database {
     public boolean createSerial(String name, String officialSite, double mark, List<Genre> genres) {
         try (Connection connection = getConnection()) {
             connection.setAutoCommit(false);
-            Statement statement = connection.createStatement();
+
+            PreparedStatement createStatement =
+                    connection.prepareStatement("CALL create_serial(?, ?, ?);");
+            PreparedStatement addGenreStatement =
+                    connection.prepareStatement("CALL add_genre_to_serial(?, ?);");
             try {
-                statement.execute("CALL create_serial(" +
-                        "\"" + name + "\", " +
-                        "\"" + officialSite + "\", " +
-                        mark +
-                        ");");
+                createStatement.setString(1, name);
+                createStatement.setString(2, officialSite);
+                createStatement.setDouble(3, mark);
+                createStatement.execute();
+
                 int idSerial = 0;
-                ResultSet result = statement.getResultSet();
+                ResultSet result = createStatement.getResultSet();
                 while (result.next())
                     idSerial = result.getInt(1);
 
                 for (Genre genre : genres) {
-                    statement.execute("CALL add_genre_to_serial(" +
-                            idSerial + ", " +
-                            genre.getId() +
-                            ");");
+                    addGenreStatement.setInt(1, idSerial);
+                    addGenreStatement.setInt(2, genre.getId());
+                    addGenreStatement.addBatch();
                 }
+                addGenreStatement.executeBatch();
+
                 connection.commit();
 
                 serials.addOrUpdate(idSerial, name, officialSite, mark, genres);
@@ -522,13 +533,14 @@ public class Database {
 
     public boolean createSeason(Serial owner, int number, int seriesCount, String torrent) {
         try (Connection connection = getConnection()) {
-            Statement statement = connection.createStatement();
-            statement.execute("CALL create_season(" +
-                    owner.getId() + ", " +
-                    number + ", " +
-                    seriesCount + ", " +
-                    "\"" + torrent + "\"" +
-                    ");");
+            PreparedStatement statement =
+                    connection.prepareStatement("CALL create_season(?, ?, ?, ?);");
+            statement.setInt(1, owner.getId());
+            statement.setInt(2, number);
+            statement.setInt(3, seriesCount);
+            statement.setString(4, torrent);
+            statement.execute();
+
             int id = 0;
             ResultSet result = statement.getResultSet();
             if (result.next()) id = result.getInt(1);
@@ -543,14 +555,15 @@ public class Database {
 
     public boolean createSeries(Season owner, int number, String name, Date releaseDate, String torrent) {
         try (Connection connection = getConnection()) {
-            Statement statement = connection.createStatement();
-            statement.execute("CALL create_series(" +
-                    owner.getId() + ", " +
-                    number + ", " +
-                    "\"" + name + "\", " +
-                    "\"" + dateFormat.format(releaseDate) + "\", " +
-                    "\"" + torrent + "\"" +
-                    ");");
+            PreparedStatement statement =
+                    connection.prepareStatement("CALL create_series(?, ?, ?, ?, ?);");
+            statement.setInt(1, owner.getId());
+            statement.setInt(2, number);
+            statement.setString(3, name);
+            statement.setString(4, dateFormat.format(releaseDate));
+            statement.setString(5, torrent);
+            statement.execute();
+
             int id = 0;
             ResultSet result = statement.getResultSet();
             if (result.next()) id = result.getInt(1);
@@ -565,10 +578,11 @@ public class Database {
 
     public boolean createGenre(String name) {
         try (Connection connection = getConnection()) {
-            Statement statement = connection.createStatement();
-            statement.execute("CALL create_genre(" +
-                    "\"" + name + "\"" +
-                    ");");
+            PreparedStatement statement =
+                    connection.prepareStatement("CALL create_genre(?);");
+            statement.setString(1, name);
+            statement.execute();
+
             int id = 0;
             ResultSet result = statement.getResultSet();
             if (result.next()) id = result.getInt(1);
@@ -583,10 +597,10 @@ public class Database {
 
     public boolean delete(Serial serial) {
         try (Connection connection = getConnection()) {
-            Statement statement = connection.createStatement();
-            statement.execute("CALL delete_serial(" +
-                    serial.getId() +
-                    ");");
+            PreparedStatement statement =
+                    connection.prepareStatement("CALL delete_serial(?);");
+            statement.setInt(1, serial.getId());
+            statement.execute();
 
             serials.remove(serial.getId());
             return true;
@@ -598,10 +612,10 @@ public class Database {
 
     public boolean delete(Season season) {
         try (Connection connection = getConnection()) {
-            Statement statement = connection.createStatement();
-            statement.execute("CALL delete_season(" +
-                    season.getId() +
-                    ");");
+            PreparedStatement statement =
+                    connection.prepareStatement("CALL delete_season(?);");
+            statement.setInt(1, season.getId());
+            statement.execute();
 
             seasons.remove(season.getId());
             return true;
@@ -613,10 +627,10 @@ public class Database {
 
     public boolean delete(Series series) {
         try (Connection connection = getConnection()) {
-            Statement statement = connection.createStatement();
-            statement.execute("CALL delete_series(" +
-                    series.getId() +
-                    ");");
+            PreparedStatement statement =
+                    connection.prepareStatement("CALL delete_series(?);");
+            statement.setInt(1, series.getId());
+            statement.execute();
 
             this.series.remove(series.getId());
             return true;
@@ -628,10 +642,10 @@ public class Database {
 
     public boolean delete(Genre genre) {
         try (Connection connection = getConnection()) {
-            Statement statement = connection.createStatement();
-            statement.execute("CALL delete_genre(" +
-                    genre.getId() +
-                    ");");
+            PreparedStatement statement =
+                    connection.prepareStatement("CALL delete_genre(?);");
+            statement.setInt(1, genre.getId());
+            statement.execute();
 
             genres.remove(genre.getId());
             return true;
@@ -707,11 +721,12 @@ public class Database {
     // users
     public boolean updateUserPassword(User user, String password) {
         try (Connection connection = getConnection()) {
-            Statement statement = connection.createStatement();
-            statement.execute("CALL change_user_password(" +
-                    "\"" + user.nameObservable().getValue() + "\", " +
-                    "\"" + password + "\"" +
-                    ");");
+            PreparedStatement statement =
+                    connection.prepareStatement("CALL change_user_password(?, ?);");
+            statement.setString(1, user.nameObservable().getValue());
+            statement.setString(2, password);
+            statement.execute();
+
             return true;
         }
         catch (SQLException e) {
@@ -721,19 +736,19 @@ public class Database {
 
     public boolean updateUserRole(User user, Role role) {
         try (Connection connection = getConnection()) {
-            Statement statement = connection.createStatement();
+            PreparedStatement statement;
             switch (role) {
-                case Guest: statement.execute("CALL make_user_guest(" +
-                        "\"" + user.nameObservable().getValue() + "\"" +
-                        ");");
+                case Guest:
+                    statement = connection.prepareStatement("CALL make_user_guest(?);");
                     break;
-                case Editor: statement.execute("CALL make_user_editor(" +
-                        "\"" + user.nameObservable().getValue() + "\"" +
-                        ");");
+                case Editor:
+                    statement = connection.prepareStatement("CALL make_user_editor(?);");
                     break;
                 default:
                     return false;
             }
+            statement.setString(1, user.nameObservable().getValue());
+            statement.execute();
 
             user.setRole(role);
             return true;
@@ -745,21 +760,20 @@ public class Database {
 
     public boolean createUser(String name, String password, Role role) {
         try (Connection connection = getConnection()) {
-            Statement statement = connection.createStatement();
+            PreparedStatement statement;
             switch (role) {
-                case Guest: statement.execute("CALL create_user_guest(" +
-                        "\"" + name + "\", " +
-                        "\"" + password + "\"" +
-                        ");");
+                case Guest:
+                    statement = connection.prepareStatement("CALL create_user_guest(?, ?);");
                     break;
-                case Editor: statement.execute("CALL create_user_editor(" +
-                        "\"" + name + "\", " +
-                        "\"" + password + "\"" +
-                        ");");
+                case Editor:
+                    statement = connection.prepareStatement("CALL create_user_editor(?, ?);");
                     break;
                 default:
                     return false;
             }
+            statement.setString(1, name);
+            statement.setString(2, password);
+            statement.execute();
 
             users.addOrUpdate(name, role);
             return true;
@@ -771,10 +785,9 @@ public class Database {
 
     public boolean delete(User user) {
         try (Connection connection = getConnection()) {
-            Statement statement = connection.createStatement();
-            statement.execute("CALL delete_user(" +
-                    "\"" + user.nameObservable().getValue() + "\"" +
-                    ");");
+            PreparedStatement statement = connection.prepareStatement("CALL delete_user(?);");
+            statement.setString(1, user.nameObservable().getValue());
+            statement.execute();
 
             users.remove(user);
             return true;
