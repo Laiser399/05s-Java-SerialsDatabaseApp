@@ -4,13 +4,21 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 
 public class Dialogs {
-    private static Alert alert = new Alert(Alert.AlertType.ERROR);
+    private static Alert alertError = new Alert(Alert.AlertType.ERROR);
+    private static Alert alertInfo = new Alert(Alert.AlertType.INFORMATION);
 
     public static void showError(String message) {
-        alert.setTitle("(◑‿◐)");
-        alert.setHeaderText("Ошибка");
-        alert.setContentText(message);
-        alert.showAndWait();
+        alertError.setTitle("(◑‿◐)");
+        alertError.setHeaderText("Ошибка");
+        alertError.setContentText(message);
+        alertError.showAndWait();
+    }
+
+    public static void showInfo(String message) {
+        alertInfo.setTitle("(ง°ل͜°)ง");
+        alertInfo.setHeaderText("Информация");
+        alertInfo.setContentText(message);
+        alertInfo.showAndWait();
     }
 
     private static Alert askAlert = new Alert(Alert.AlertType.CONFIRMATION, "",

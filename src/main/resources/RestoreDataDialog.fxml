@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.text.Font?>
+
+<GridPane prefWidth="380.0" xmlns="http://javafx.com/javafx/8.0.999-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.RestoreDataDialog.RestoreDataDialogController">
+   <columnConstraints>
+      <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" />
+      <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
+      <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" />
+   </columnConstraints>
+   <rowConstraints>
+      <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" vgrow="SOMETIMES" />
+   </rowConstraints>
+   <children>
+      <Label text="genre" GridPane.rowIndex="1">
+         <GridPane.margin>
+            <Insets bottom="4.0" left="8.0" right="4.0" top="4.0" />
+         </GridPane.margin></Label>
+      <Label text="serial_to_genre" GridPane.rowIndex="2">
+         <GridPane.margin>
+            <Insets bottom="4.0" left="8.0" right="4.0" top="4.0" />
+         </GridPane.margin></Label>
+      <Label text="serial" GridPane.rowIndex="3">
+         <GridPane.margin>
+            <Insets bottom="4.0" left="8.0" right="4.0" top="4.0" />
+         </GridPane.margin></Label>
+      <Label text="season" GridPane.rowIndex="4">
+         <GridPane.margin>
+            <Insets bottom="4.0" left="8.0" right="4.0" top="4.0" />
+         </GridPane.margin></Label>
+      <Label text="series" GridPane.rowIndex="5">
+         <GridPane.margin>
+            <Insets bottom="4.0" left="8.0" right="4.0" top="4.0" />
+         </GridPane.margin></Label>
+      <TextField fx:id="genreField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="1">
+         <GridPane.margin>
+            <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+         </GridPane.margin></TextField>
+      <TextField fx:id="stgField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="2">
+         <GridPane.margin>
+            <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+         </GridPane.margin>
+      </TextField>
+      <TextField fx:id="serialField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="3">
+         <GridPane.margin>
+            <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+         </GridPane.margin>
+      </TextField>
+      <TextField fx:id="seasonField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="4">
+         <GridPane.margin>
+            <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+         </GridPane.margin>
+      </TextField>
+      <TextField fx:id="seriesField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="5">
+         <GridPane.margin>
+            <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+         </GridPane.margin>
+      </TextField>
+      <Button id="0" mnemonicParsing="false" onAction="#onOverview" text="Обзор" GridPane.columnIndex="2" GridPane.rowIndex="1">
+         <GridPane.margin>
+            <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+         </GridPane.margin>
+      </Button>
+      <Button id="1" mnemonicParsing="false" onAction="#onOverview" text="Обзор" GridPane.columnIndex="2" GridPane.rowIndex="2">
+         <GridPane.margin>
+            <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+         </GridPane.margin>
+      </Button>
+      <Button id="2" mnemonicParsing="false" onAction="#onOverview" text="Обзор" GridPane.columnIndex="2" GridPane.rowIndex="3">
+         <GridPane.margin>
+            <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+         </GridPane.margin>
+      </Button>
+      <Button id="3" mnemonicParsing="false" onAction="#onOverview" text="Обзор" GridPane.columnIndex="2" GridPane.rowIndex="4">
+         <GridPane.margin>
+            <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+         </GridPane.margin>
+      </Button>
+      <Button id="4" mnemonicParsing="false" onAction="#onOverview" text="Обзор" GridPane.columnIndex="2" GridPane.rowIndex="5">
+         <GridPane.margin>
+            <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+         </GridPane.margin>
+      </Button>
+      <HBox prefHeight="0.0" prefWidth="0.0" GridPane.columnSpan="3" GridPane.rowIndex="6">
+         <children>
+            <Pane maxHeight="-Infinity" prefHeight="0.0" prefWidth="0.0" HBox.hgrow="ALWAYS" />
+            <Button mnemonicParsing="false" onAction="#onOk" text="Ок">
+               <HBox.margin>
+                  <Insets bottom="12.0" left="4.0" right="4.0" top="12.0" />
+               </HBox.margin>
+            </Button>
+            <Button mnemonicParsing="false" onAction="#onCancel" text="Отмена">
+               <HBox.margin>
+                  <Insets bottom="12.0" left="4.0" right="4.0" top="12.0" />
+               </HBox.margin>
+            </Button>
+         </children>
+      </HBox>
+      <Label text="Выберите файлы с данными соответствующих таблиц" GridPane.columnSpan="3">
+         <font>
+            <Font size="14.0" />
+         </font>
+         <GridPane.margin>
+            <Insets bottom="4.0" left="8.0" right="4.0" top="4.0" />
+         </GridPane.margin>
+      </Label>
+   </children>
+</GridPane>

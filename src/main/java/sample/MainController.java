@@ -4,24 +4,29 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.DirectoryChooser;
+import sample.RestoreDataDialog.RestoreDataDialog;
 import sample.controllers.*;
 import sample.database.Database;
+import sample.database.records.Genre;
 import sample.exceptions.AuthException;
 import sample.exceptions.ConnectTimeoutException;
 import sample.database.records.Season;
 import sample.database.records.Serial;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ResourceBundle;
 
-// TODO menu bar and window title
+
 public class MainController implements Initializable {
     //auth
     @FXML private VBox authPane;
@@ -36,6 +41,11 @@ public class MainController implements Initializable {
     private SeriesController seriesController;
     private GenresController genresController;
     private UsersController usersController;
+    // restore/save
+    @FXML private MenuItem restoreMenuItem, separatorDB, clearMenuItem;
+
+    private DirectoryChooser directoryChooser = new DirectoryChooser();
+    private RestoreDataDialog restoreDialog = new RestoreDataDialog();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -101,6 +111,7 @@ public class MainController implements Initializable {
     // methods
     private void configureForGuest() {
         setEditableMainControllers(false);
+        setDisabledRestoreMenuItems(true);
 
         genresTab.setDisable(true);
         databaseTabPane.getTabs().remove(genresTab);
@@ -111,6 +122,7 @@ public class MainController implements Initializable {
 
     private void configureForEditor() {
         setEditableMainControllers(true);
+        setDisabledRestoreMenuItems(true);
 
         genresTab.setDisable(false);
         if (!databaseTabPane.getTabs().contains(genresTab))
@@ -122,6 +134,7 @@ public class MainController implements Initializable {
 
     private void configureForSuperuser() {
         setEditableMainControllers(true);
+        setDisabledRestoreMenuItems(false);
 
         genresTab.setDisable(false);
         if (!databaseTabPane.getTabs().contains(genresTab))
@@ -137,6 +150,13 @@ public class MainController implements Initializable {
         seasonsController.setSeasonsEditable(editable);
         seriesController.setSeriesEditable(editable);
     }
+
+    private void setDisabledRestoreMenuItems(boolean disable) {
+        restoreMenuItem.setDisable(disable);
+        separatorDB.setDisable(disable);
+        clearMenuItem.setDisable(disable);
+    }
+
 
     // fxml's events
     private void onSerialSelected(Serial serial) {
@@ -209,7 +229,7 @@ public class MainController implements Initializable {
     // menu bar
     @FXML private void onChangeUser() {
         if (database != null)
-            database.close();
+            database.stopCheckUpdates();
         database = null;
 
         databaseTabPane.setVisible(false);
@@ -218,6 +238,67 @@ public class MainController implements Initializable {
 
     @FXML private void onExit() {
         System.exit(0);
+    }
+
+    @FXML private void onSaveData() {
+        if (database == null) return;
+
+        File file = directoryChooser.showDialog(null);
+        if (file == null) return;
+
+        boolean result;
+        database.stopCheckUpdates();
+        result = DataSaver.saveGenres(database.getGenres(), new File(file, "genre.txt"));
+        result &= DataSaver.saveSerials(database.getSerials(), new File(file, "serial.txt"));
+        result &= DataSaver.saveSeasons(database.getSeasons(), new File(file, "season.txt"));
+        result &= DataSaver.saveSeries(database.getSeries(), new File(file, "series.txt"));
+        result &= DataSaver.saveSTG(database.getSerials(), new File(file, "serial_to_genre.txt"));
+        database.startCheckUpdates();
+
+        if (!result) {
+            Dialogs.showError("Ошибка сохранения одной из таблиц.");
+        }
+        else {
+            Dialogs.showInfo("Данные сохранены.");
+        }
+    }
+
+    @FXML private void onRestoreData() {
+        if (database == null) return;
+
+        restoreDialog.showAndWait();
+        if (!restoreDialog.isHaveResult()) return;
+
+        database.stopCheckUpdates();
+
+        boolean res;
+        res = database.restoreGenres(new File(restoreDialog.getGenreFilename()));
+        res &= database.restoreSerials(new File(restoreDialog.getSerialFilename()));
+        res &= database.restoreSeasons(new File(restoreDialog.getSeasonFilename()));
+        res &= database.restoreSeries(new File(restoreDialog.getSeriesFilename()));
+        res &= database.restoreSTG(new File(restoreDialog.getStgFilename()));
+
+        if (!res) {
+            Dialogs.showError("Ошибка восстановления данных.");
+        }
+        else {
+            Dialogs.showInfo("Данные восстановлены.");
+        }
+        database.startCheckUpdates();
+    }
+
+    @FXML private void onClearData() {
+        if (database == null) return;
+        if (Dialogs.askFor("Удалить все сериалы и жанры?") == ButtonType.NO) return;
+
+        database.stopCheckUpdates();
+        if (database.deleteAll()) {
+            Dialogs.showInfo("Данные удалены.");
+        }
+        else {
+            Dialogs.showError("Ошибка удаления данных.");
+        }
+        database.startCheckUpdates();
     }
 
     @FXML private void onAuthor() {

@@ -4,6 +4,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import sample.database.records.Series;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,6 +37,10 @@ public class SeriesContainer {
         Series series = seriesById.remove(id);
         if (series != null)
             seriesListBySeasonId.get(series.getIdSeason()).remove(series);
+    }
+
+    public Collection<Series> getSeries() {
+        return seriesById.values();
     }
 
     public ObservableList<Series> getBySeasonId(int idSeason) {

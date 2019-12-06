@@ -1,16 +1,18 @@
 package sample.database;
 
 import javafx.collections.ObservableList;
+import sample.DataRestorer;
 import sample.RunnableTask;
 import sample.database.containers.*;
+import sample.database.records.*;
 import sample.exceptions.AuthException;
 import sample.exceptions.ConnectTimeoutException;
-import sample.database.records.*;
 
+import java.io.File;
 import java.sql.*;
 import java.text.SimpleDateFormat;
-import java.util.*;
 import java.util.Date;
+import java.util.*;
 
 public class Database {
     public enum Role {
@@ -32,7 +34,7 @@ public class Database {
     private String host, login, password;
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     private int lastMainChangeId = 0, lastStgChangeId = 0;
-    private Timer timer = new Timer(true);
+    private Timer timer = null;
     private GenresContainer genres = new GenresContainer();
     private SerialsContainer serials = new SerialsContainer();
     private SeasonsContainer seasons = new SeasonsContainer();
@@ -55,11 +57,7 @@ public class Database {
             initUsersIfNeed();
             initLastChangeIds(connection);
 
-            timer.schedule(new RunnableTask(this::checkUpdates), 0, 1000);
-
-            if (role == Role.Superuser) {
-                timer.schedule(new RunnableTask(this::checkUsersUpdates), 0, 5000);
-            }
+            startCheckUpdates();
         }
         catch (SQLTimeoutException e) {
             throw new ConnectTimeoutException();
@@ -69,14 +67,23 @@ public class Database {
         }
     }
 
-    public void close() {
+    public void startCheckUpdates() {
+        if (timer != null) return;
+
+        timer = new Timer(true);
+        timer.schedule(new RunnableTask(this::checkUpdates), 0, 1000);
+        if (role == Role.Superuser)
+            timer.schedule(new RunnableTask(this::checkUsersUpdates), 0, 5000);
+    }
+
+    public void stopCheckUpdates() {
         if (timer != null) {
             timer.cancel();
             timer = null;
         }
     }
 
-    private Connection getConnection() throws SQLException {
+    public Connection getConnection() throws SQLException {
         return DriverManager.getConnection(
                 "jdbc:mysql://" + host + "/serials_cw?serverTimezone=Europe/Moscow",
                 login, password);
@@ -108,6 +115,20 @@ public class Database {
                 serials.addOrUpdate(id, name, officialSite, mark, genres);
             }
         }
+    }
+
+    private List<Genre> getSerialGenres(int idSerial, Connection connection) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("CALL get_genres_id_for(?);");
+        statement.setInt(1, idSerial);
+        List<Genre> result = new ArrayList<>();
+        if (statement.execute()) {
+            ResultSet resultIds = statement.getResultSet();
+            while (resultIds.next()) {
+                int idGenre = resultIds.getInt("id_genre");
+                genres.getById(idGenre).ifPresent(result::add);
+            }
+        }
+        return result;
     }
 
     private void initSeasons(Connection connection) throws SQLException {
@@ -194,6 +215,9 @@ public class Database {
     }
 
     private void checkMainUpdates(Connection connection) throws SQLException {
+//        PreparedStatement statement = connection.prepareStatement("CALL get_changes_after(?);");
+//        statement.setInt(1, lastMainChangeId);
+
         Statement statement = connection.createStatement();
         statement.execute("CALL get_changes_after(" +
                 lastMainChangeId +
@@ -335,19 +359,6 @@ public class Database {
     }
 
     // observable
-    private List<Genre> getSerialGenres(int idSerial, Connection connection) throws SQLException {
-        Statement genresStatement = connection.createStatement();
-        List<Genre> result = new ArrayList<>();
-        if (genresStatement.execute("CALL get_genres_id_for(" + idSerial + ");")) {
-            ResultSet resultIds = genresStatement.getResultSet();
-            while (resultIds.next()) {
-                int idGenre = resultIds.getInt("id_genre");
-                genres.getById(idGenre).ifPresent(result::add);
-            }
-        }
-        return result;
-    }
-
     public ObservableList<Genre> getGenres() {
         return genres.getGenresObservable();
     }
@@ -356,8 +367,16 @@ public class Database {
         return serials.getSerialsObservable();
     }
 
+    public Collection<Season> getSeasons() {
+        return seasons.getSeasons();
+    }
+
     public ObservableList<Season> getSeasonsFor(int serialId) {
         return seasons.getBySerialId(serialId);
+    }
+
+    public Collection<Series> getSeries() {
+        return series.getSeries();
     }
 
     public ObservableList<Series> getSeriesFor(int seasonId) {
@@ -616,6 +635,69 @@ public class Database {
 
             genres.remove(genre.getId());
             return true;
+        }
+        catch (SQLException e) {
+            return false;
+        }
+    }
+
+    public boolean deleteAll() {
+        try (Connection connection = getConnection()) {
+            Statement statement = connection.createStatement();
+            statement.addBatch("DELETE FROM serial_to_genre;");
+            statement.addBatch("DELETE FROM series;");
+            statement.addBatch("DELETE FROM season;");
+            statement.addBatch("DELETE FROM serial;");
+            statement.addBatch("DELETE FROM genre;");
+            statement.executeBatch();
+            statement.close();
+            return true;
+        }
+        catch (SQLException e) {
+            return false;
+        }
+    }
+
+    // restore
+    public boolean restoreGenres(File file) {
+        try (Connection connection = getConnection()) {
+            return DataRestorer.restoreGenres(connection, file);
+        }
+        catch (SQLException e) {
+            return false;
+        }
+    }
+
+    public boolean restoreSerials(File file) {
+        try (Connection connection = getConnection()) {
+            return DataRestorer.restoreSerials(connection, file);
+        }
+        catch (SQLException e) {
+            return false;
+        }
+    }
+
+    public boolean restoreSeasons(File file) {
+        try (Connection connection = getConnection()) {
+            return DataRestorer.restoreSeasons(connection, file);
+        }
+        catch (SQLException e) {
+            return false;
+        }
+    }
+
+    public boolean restoreSeries(File file) {
+        try (Connection connection = getConnection()) {
+            return DataRestorer.restoreSeries(connection, file);
+        }
+        catch (SQLException e) {
+            return false;
+        }
+    }
+
+    public boolean restoreSTG(File file) {
+        try (Connection connection = getConnection()) {
+            return DataRestorer.restoreSTG(connection, file);
         }
         catch (SQLException e) {
             return false;
