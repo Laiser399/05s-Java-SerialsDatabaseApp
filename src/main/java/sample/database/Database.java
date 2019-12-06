@@ -83,7 +83,7 @@ public class Database {
         }
     }
 
-    public Connection getConnection() throws SQLException {
+    private Connection getConnection() throws SQLException {
         return DriverManager.getConnection(
                 "jdbc:mysql://" + host + "/serials_cw?serverTimezone=Europe/Moscow",
                 login, password);
